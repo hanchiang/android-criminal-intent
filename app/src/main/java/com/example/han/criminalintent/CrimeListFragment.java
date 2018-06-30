@@ -44,25 +44,14 @@ public class CrimeListFragment extends Fragment {
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mTitleTextView;
         private TextView mDateTextView;
-        private Button mContactPoliceButton;
         private Crime mCrime;
 
-        CrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
-            super(inflater.inflate(layoutId, parent, false));
+        CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.list_item_crime, parent, false));
             this.itemView.setOnClickListener(this);
 
             mTitleTextView = (TextView) this.itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) this.itemView.findViewById(R.id.crime_date);
-
-            if (layoutId == R.layout.list_item_crime_police) {
-                mContactPoliceButton = this.itemView.findViewById(R.id.call_police_button);
-                mContactPoliceButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(getActivity(), "Contacting police for " + mCrime.getTitle(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
         }
 
         @Override
@@ -88,17 +77,9 @@ public class CrimeListFragment extends Fragment {
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new CrimeHolder(layoutInflater, parent, viewType);
+            return new CrimeHolder(layoutInflater, parent);
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            if (mCrimes.get(position).isRequiresPolice()) {
-                return R.layout.list_item_crime_police;
-            } else {
-                return R.layout.list_item_crime;
-            }
-        }
 
         @Override
         public void onBindViewHolder(CrimeHolder holder, int position) {

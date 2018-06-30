@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,9 +43,10 @@ public class CrimeListFragment extends Fragment {
 
     // ViewHolder
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private Crime mCrime;
         private TextView mTitleTextView;
         private TextView mDateTextView;
-        private Crime mCrime;
+        private ImageView mSolvedImageView;
 
         CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_crime, parent, false));
@@ -52,6 +54,7 @@ public class CrimeListFragment extends Fragment {
 
             mTitleTextView = (TextView) this.itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) this.itemView.findViewById(R.id.crime_date);
+            mSolvedImageView = (ImageView) this.itemView.findViewById(R.id.crime_solved);
         }
 
         @Override
@@ -63,6 +66,7 @@ public class CrimeListFragment extends Fragment {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
+            mSolvedImageView.setVisibility(crime.isSolved() ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

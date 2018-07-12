@@ -1,6 +1,7 @@
 package com.example.han.criminalintent;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,15 +22,19 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
     private static final String TAG = "crime_fragment";
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String ARG_CRIME_POSITION = "crime_position";
+    private static final String IS_MODIFIED = "is_modified";
 
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
+    private boolean isModified;
 
-    public static CrimeFragment newInstance(UUID crimeId) {
+    public static CrimeFragment newInstance(UUID crimeId, int position) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
+        args.putInt(ARG_CRIME_POSITION, position);
 
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
@@ -37,17 +42,17 @@ public class CrimeFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
+
 
         mTitleField = (EditText) v.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
@@ -60,7 +65,9 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                handleModified();
             }
+
             
             @Override
             public void afterTextChanged(Editable s) {
@@ -78,8 +85,27 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { 
                 mCrime.setSolved(isChecked);
+                handleModified();
             }
         });
         return v;
+    }
+
+    public static boolean isCrimeModified(Intent data) {
+        return data.getBooleanExtra(IS_MODIFIED, false);
+    }
+
+    public static int getCrimePosition(Intent data) {
+        return data.getIntExtra(ARG_CRIME_POSITION, 0);
+    }
+
+    private void handleModified() {
+        if (!isModified) {
+            isModified = true;
+            Intent intent = new Intent();
+            intent.putExtra(IS_MODIFIED, true);
+            intent.putExtra(ARG_CRIME_POSITION, getArguments().getInt(ARG_CRIME_POSITION));
+            getActivity().setResult(getActivity().RESULT_OK, intent);
+        }
     }
 }

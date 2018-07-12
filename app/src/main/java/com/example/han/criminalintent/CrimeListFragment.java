@@ -20,6 +20,7 @@ import java.util.List;
 
 public class CrimeListFragment extends Fragment {
     private static final String TAG = "crime_list_fragment";
+    private static final int REQUEST_CRIME = 1;
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
@@ -40,10 +41,17 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUI();
     }
 
     private void updateUI() {
+        CrimeLab crimeLab = CrimeLab.get(getActivity());
+        List<Crime> crimes = crimeLab.getCrimes();
+
+        mAdapter = new CrimeAdapter(crimes);
+        mCrimeRecyclerView.setAdapter(mAdapter);
+    }
+
+    private void updateUI(int position) {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
@@ -51,7 +59,23 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemChanged(position);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != getActivity().RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_CRIME) {
+            if (data == null) {
+                return;
+            }
+            boolean isCrimeModified = CrimeFragment.isCrimeModified(data);
+            if (isCrimeModified) {
+                updateUI(CrimeFragment.getCrimePosition(data));
+            }
         }
     }
 
@@ -74,10 +98,10 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
-
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId(), getAdapterPosition());
+            startActivityForResult(intent, REQUEST_CRIME);
         }
+
 
         public void bind(Crime crime) {
             mCrime = crime;

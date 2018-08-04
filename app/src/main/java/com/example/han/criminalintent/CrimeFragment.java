@@ -1,6 +1,7 @@
 package com.example.han.criminalintent;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private boolean isModified;
 
+    // Save values in fragment arguments
     public static CrimeFragment newInstance(UUID crimeId, int position) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
@@ -99,13 +101,15 @@ public class CrimeFragment extends Fragment {
         return data.getIntExtra(ARG_CRIME_POSITION, 0);
     }
 
+    // Set isModified, put it and item position into intent, and call setResult()
+    // to let CrimeListFragment know that the item has changed
     private void handleModified() {
         if (!isModified) {
             isModified = true;
             Intent intent = new Intent();
             intent.putExtra(IS_MODIFIED, true);
             intent.putExtra(ARG_CRIME_POSITION, getArguments().getInt(ARG_CRIME_POSITION));
-            getActivity().setResult(getActivity().RESULT_OK, intent);
+            getActivity().setResult(Activity.RESULT_OK, intent);
         }
     }
 }

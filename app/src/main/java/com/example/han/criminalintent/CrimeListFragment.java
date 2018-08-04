@@ -37,12 +37,6 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
@@ -51,17 +45,6 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView.setAdapter(mAdapter);
     }
 
-    private void updateUI(int position) {
-        CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimes = crimeLab.getCrimes();
-
-        if (mAdapter == null) {
-            mAdapter = new CrimeAdapter(crimes);
-            mCrimeRecyclerView.setAdapter(mAdapter);
-        } else {
-            mAdapter.notifyItemChanged(position);
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -74,10 +57,11 @@ public class CrimeListFragment extends Fragment {
             }
             boolean isCrimeModified = CrimeFragment.isCrimeModified(data);
             if (isCrimeModified) {
-                updateUI(CrimeFragment.getCrimePosition(data));
+                mAdapter.notifyItemChanged(CrimeFragment.getCrimePosition(data));
             }
         }
     }
+
 
     // ViewHolder
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
